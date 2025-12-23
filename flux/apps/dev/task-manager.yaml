@@ -31,8 +31,6 @@ spec:
   dependsOn:
     - name: cloudnative-pg
       namespace: flux-system
-    - name: dragonfly-operator
-      namespace: flux-system
 ---
 apiVersion: v1
 kind: ConfigMap
