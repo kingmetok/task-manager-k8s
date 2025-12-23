@@ -1,0 +1,56 @@
+# Production environment overrides
+app:
+  replicaCount: 3
+
+  image:
+    tag: "1.0.0"  # Use specific version in prod
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: task-manager-prod.127.0.0.1.sslip.io
+        paths:
+          - path: /
+            pathType: Prefix
+
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+postgresql:
+  enabled: true
+  persistence:
+    size: 10Gi
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+dragonfly:
+  enabled: true
+  replicas: 2  # HA setup
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+namespace:
+  name: task-manager-prod

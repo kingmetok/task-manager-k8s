@@ -1,0 +1,36 @@
+🎉 Task Manager has been deployed!
+
+📦 Release: {{ .Release.Name }}
+📂 Namespace: {{ .Values.namespace.name }}
+
+🌐 Application:
+{{- if .Values.app.ingress.enabled }}
+  URL: http://{{ (index .Values.app.ingress.hosts 0).host }}
+  Swagger UI: http://{{ (index .Values.app.ingress.hosts 0).host }}/swagger-ui.html
+{{- else }}
+  Run these commands to access the application:
+  
+  kubectl port-forward -n {{ .Values.namespace.name }} svc/{{ include "task-manager.fullname" . }} 8080:8080
+  
+  Then open: http://localhost:8080
+  Swagger UI: http://localhost:8080/swagger-ui.html
+{{- end }}
+
+📊 Status:
+  kubectl get all -n {{ .Values.namespace.name }}
+
+📝 Logs:
+  kubectl logs -n {{ .Values.namespace.name }} -l app.kubernetes.io/name={{ include "task-manager.name" . }} -f
+
+🔍 Health Check:
+  kubectl get -n {{ .Values.namespace.name }} deployment/{{ include "task-manager.fullname" . }}
+
+💾 Database: {{ .Values.postgresql.auth.database }}
+🔄 Cache: Dragonfly (Redis-compatible)
+
+{{- if .Values.app.autoscaling.enabled }}
+
+⚡ Autoscaling: ENABLED
+  Min replicas: {{ .Values.app.autoscaling.minReplicas }}
+  Max replicas: {{ .Values.app.autoscaling.maxReplicas }}
+{{- end }}

@@ -1,0 +1,18 @@
+{{- if .Values.dragonfly.enabled }}
+apiVersion: dragonflydb.io/v1alpha1
+kind: Dragonfly
+metadata:
+  name: {{ include "task-manager.dragonfly.fullname" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "task-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: cache
+spec:
+  replicas: {{ .Values.dragonfly.replicas }}
+  image: {{ .Values.dragonfly.image }}
+  resources:
+    {{- toYaml .Values.dragonfly.resources | nindent 4 }}
+  args:
+    - --maxmemory={{ .Values.dragonfly.resources.limits.memory }}
+    - --proactor_threads=2
+{{- end }}

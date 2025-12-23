@@ -1,0 +1,138 @@
+# ===========================================
+# Global Configuration
+# ===========================================
+global:
+  nameOverride: ""
+  fullnameOverride: ""
+
+# ===========================================
+# Application Configuration
+# ===========================================
+app:
+  name: task-manager
+
+  # Docker image
+  image:
+    repository: ghcr.io/kingmetok/task-manager-k8s
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  # Replicas
+  replicaCount: 1
+
+  # Resources
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # Environment variables
+  env:
+    javaOpts: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+
+  # Service
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+
+  # Ingress
+  ingress:
+    enabled: false
+    className: nginx
+    annotations: {}
+    hosts:
+      - host: task-manager.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /actuator/health/liveness
+      port: 8080
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /actuator/health/readiness
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  # HPA (Horizontal Pod Autoscaler)
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# ===========================================
+# PostgreSQL Configuration
+# ===========================================
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: postgres
+    database: taskmanager
+
+  # Persistence
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 1Gi
+
+  # Resources
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # PostgreSQL version
+  image:
+    registry: docker.io
+    repository: postgres
+    tag: "16-alpine"
+
+# ===========================================
+# Dragonfly (Redis) Configuration
+# ===========================================
+dragonfly:
+  enabled: true
+
+  # Replicas
+  replicas: 1
+
+  # Resources
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+  # Image (managed by Dragonfly Operator)
+  image: docker.dragonflydb.io/dragonflydb/dragonfly:v1.23.1
+
+# ===========================================
+# Namespace
+# ===========================================
+namespace:
+  create: true
+  name: task-manager

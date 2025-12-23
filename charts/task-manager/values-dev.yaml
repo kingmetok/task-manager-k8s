@@ -1,0 +1,52 @@
+# Development environment overrides
+app:
+  replicaCount: 1
+
+  image:
+    tag: "latest"
+    pullPolicy: Always  # Always pull for dev
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: task-manager-dev.127.0.0.1.sslip.io
+        paths:
+          - path: /
+            pathType: Prefix
+
+  autoscaling:
+    enabled: false
+
+postgresql:
+  enabled: true
+  persistence:
+    size: 1Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
+
+dragonfly:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+namespace:
+  name: task-manager-dev
