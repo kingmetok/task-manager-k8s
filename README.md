@@ -94,6 +94,33 @@ docker run -p 8080:8080 \
 | `REDIS_HOST` | Redis/Dragonfly host | localhost |
 | `REDIS_PORT` | Redis/Dragonfly port | 6379 |
 
-## License
+# Task Manager REST API
 
-MIT
+[![Build and Push Docker Image](https://github.com/USERNAME/task-manager-k8s/actions/workflows/docker-build.yml/badge.svg)](https://github.com/USERNAME/task-manager-k8s/actions/workflows/docker-build.yml)
+
+Kubernetes course project - Task Management REST API with PostgreSQL and Redis caching.
+
+## Docker Image
+```bash
+docker pull ghcr.io/kingmetok/task-manager-k8s:latest
+```
+
+## Features
+
+- ✅ CRUD REST API for task management
+- ✅ PostgreSQL for data persistence
+- ✅ Redis (Dragonfly) for caching
+- ✅ Multi-stage Docker build (~350 MB)
+- ✅ Kubernetes ready (health checks, probes)
+- ✅ OpenAPI/Swagger documentation
+
+## Quick Start
+```bash
+# Pull image
+docker pull ghcr.io/kingmetok/task-manager-k8s:latest
+
+# Run with docker-compose
+docker-compose up -d
+
+# Access Swagger UI
+open http://localhost:8080/swagger-ui.html
