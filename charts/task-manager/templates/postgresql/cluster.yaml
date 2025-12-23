@@ -1,0 +1,80 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "task-manager.postgresql.fullname" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "task-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: database
+spec:
+  # Number of instances (replicas)
+  instances: {{ .Values.postgresql.instances | default 1 }}
+  
+  # PostgreSQL version
+  imageName: {{ .Values.postgresql.image.registry }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+  
+  # Bootstrap configuration
+  bootstrap:
+    initdb:
+      database: {{ .Values.postgresql.auth.database }}
+      owner: {{ .Values.postgresql.auth.username }}
+      secret:
+        name: {{ include "task-manager.postgresql.fullname" . }}-superuser
+  
+  # Storage configuration
+  storage:
+    size: {{ .Values.postgresql.persistence.size }}
+    {{- if .Values.postgresql.persistence.storageClass }}
+    storageClass: {{ .Values.postgresql.persistence.storageClass }}
+    {{- end }}
+  
+  # Resources
+  resources:
+    requests:
+      cpu: {{ .Values.postgresql.resources.requests.cpu }}
+      memory: {{ .Values.postgresql.resources.requests.memory }}
+    limits:
+      cpu: {{ .Values.postgresql.resources.limits.cpu }}
+      memory: {{ .Values.postgresql.resources.limits.memory }}
+  
+  # Monitoring
+  monitoring:
+    enabled: false
+  
+  # PostgreSQL configuration
+  postgresql:
+    parameters:
+      max_connections: "100"
+      shared_buffers: "128MB"
+      effective_cache_size: "512MB"
+      maintenance_work_mem: "64MB"
+      log_statement: "mod"
+      log_min_duration_statement: "1000"
+  
+  # Backup configuration (optional)
+  {{- if .Values.postgresql.backup.enabled }}
+  backup:
+    barmanObjectStore:
+      destinationPath: {{ .Values.postgresql.backup.destinationPath }}
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
+    retentionPolicy: "30d"
+  {{- end }}
+---
+# Superuser secret for CloudNativePG
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "task-manager.postgresql.fullname" . }}-superuser
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "task-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: database
+type: kubernetes.io/basic-auth
+stringData:
+  username: {{ .Values.postgresql.auth.username }}
+  password: {{ .Values.postgresql.auth.password }}
+{{- end }}

@@ -31,6 +31,7 @@ app:
 
 postgresql:
   enabled: true
+  instances: 3
   persistence:
     size: 10Gi
   resources:
@@ -40,6 +41,8 @@ postgresql:
     limits:
       cpu: 2000m
       memory: 2Gi
+  backup:
+    enabled: false
 
 dragonfly:
   enabled: true

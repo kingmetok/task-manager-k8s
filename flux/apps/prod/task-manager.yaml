@@ -1,0 +1,95 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: task-manager-prod
+  namespace: flux-system
+spec:
+  interval: 10m
+  timeout: 5m
+  releaseName: task-manager-prod
+  targetNamespace: task-manager-prod
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  chart:
+    spec:
+      chart: ./charts/task-manager
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+      interval: 1h
+  valuesFrom:
+    - kind: ConfigMap
+      name: task-manager-prod-values
+      optional: false
+  dependsOn:
+    - name: cloudnative-pg
+      namespace: flux-system
+    - name: dragonfly-operator
+      namespace: flux-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: task-manager-prod-values
+  namespace: flux-system
+data:
+  values.yaml: |
+    app:
+      replicaCount: 3
+      image:
+        tag: "1.0.0"
+        pullPolicy: IfNotPresent
+      resources:
+        requests:
+          cpu: 200m
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+      ingress:
+        enabled: true
+        hosts:
+          - host: task-manager-prod.127.0.0.1.sslip.io
+            paths:
+              - path: /
+                pathType: Prefix
+      autoscaling:
+        enabled: true
+        minReplicas: 3
+        maxReplicas: 10
+        targetCPUUtilizationPercentage: 70
+        targetMemoryUtilizationPercentage: 80
+    
+    postgresql:
+      enabled: true
+      instances: 3  # High Availability
+      persistence:
+        size: 10Gi
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: 2000m
+          memory: 2Gi
+    
+    dragonfly:
+      enabled: true
+      replicas: 2  # High Availability
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+    
+    namespace:
+      name: task-manager-prod

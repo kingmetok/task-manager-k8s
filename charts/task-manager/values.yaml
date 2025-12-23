@@ -79,21 +79,25 @@ app:
     targetMemoryUtilizationPercentage: 80
 
 # ===========================================
-# PostgreSQL Configuration
+# PostgreSQL Configuration (CloudNativePG)
 # ===========================================
 postgresql:
   enabled: true
+  
+  # CloudNativePG Cluster configuration
+  instances: 1  # Number of PostgreSQL replicas
+  
   auth:
     username: postgres
     password: postgres
     database: taskmanager
-
+  
   # Persistence
   persistence:
     enabled: true
     storageClass: ""
     size: 1Gi
-
+  
   # Resources
   resources:
     requests:
@@ -102,12 +106,17 @@ postgresql:
     limits:
       cpu: 500m
       memory: 512Mi
-
+  
   # PostgreSQL version
   image:
     registry: docker.io
     repository: postgres
     tag: "16-alpine"
+  
+  # Backup configuration (optional)
+  backup:
+    enabled: false
+    destinationPath: ""  # s3://bucket/path or similar# ===========================================
 
 # ===========================================
 # Dragonfly (Redis) Configuration
