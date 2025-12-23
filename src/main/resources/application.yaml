@@ -1,0 +1,188 @@
+spring:
+  application:
+    name: task-manager
+
+  # Database Configuration (Spring Boot 4.x)
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:taskmanager}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: TaskManagerPool
+
+  # JPA/Hibernate Configuration
+  jpa:
+    open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        highlight_sql: true
+        jdbc:
+          batch_size: 20
+          time_zone: UTC
+        order_inserts: true
+        order_updates: true
+
+  # Redis Configuration (Spring Boot 4.x compatible)
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+      connect-timeout: 2s
+      client-type: lettuce
+      lettuce:
+        pool:
+          enabled: true
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: -1ms
+          time-between-eviction-runs: 1m
+
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 10m
+      cache-null-values: false
+      use-key-prefix: true
+      key-prefix: "taskmanager:"
+
+  # Error handling
+  web:
+    error:
+      include-message: always
+      include-binding-errors: always
+      include-stacktrace: on_param
+      include-exception: false
+
+# Server Configuration
+server:
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+# Spring Boot 4.x Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState,ping
+        readiness:
+          include: readinessState,db,redis
+    info:
+      enabled: true
+
+  # Health indicators
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+    db:
+      enabled: true
+    redis:
+      enabled: true
+    diskspace:
+      enabled: true
+      threshold: 10MB
+
+  # Metrics configuration
+  metrics:
+    enable:
+      jvm: true
+      system: true
+      process: true
+      http: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+
+  # Info endpoint
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Application Info (visible in /actuator/info)
+info:
+  app:
+    name: ${spring.application.name}
+    description: Task Management System with Redis Caching
+    version: '@project.version@'
+    encoding: '@project.build.sourceEncoding@'
+    java:
+      version: '@java.version@'
+
+# Springdoc OpenAPI 3.0 Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    doc-expansion: none
+    display-request-duration: true
+    filter: true
+  show-actuator: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.app.taskmanager: DEBUG
+    org.springframework.web: INFO
+    org.springframework.cache: DEBUG
+    org.springframework.data.redis: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/task-manager.log
+  logback:
+    rollingpolicy:
+      max-history: 7
+      max-file-size: 10MB
+      total-size-cap: 100MB
+
+# Graceful shutdown
+spring.lifecycle.timeout-per-shutdown-phase: 30s
+
+# Thread pool configuration (Java 21 Virtual Threads)
+spring.threads.virtual.enabled: true
