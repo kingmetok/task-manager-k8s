@@ -111,7 +111,7 @@ postgresql:
   image:
     registry: docker.io
     repository: postgres
-    tag: "16-alpine"
+    tag: "16"
   
   # Backup configuration (optional)
   backup:

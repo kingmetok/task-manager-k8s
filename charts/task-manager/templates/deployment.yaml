@@ -48,14 +48,14 @@ spec:
                   key: DB_NAME
             - name: DB_USER
               valueFrom:
-                configMapKeyRef:
-                  name: {{ include "task-manager.fullname" . }}-config
-                  key: DB_USER
+                secretKeyRef:
+                  name: {{ include "task-manager.postgresql.fullname" . }}-superuser
+                  key: username
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "task-manager.fullname" . }}-secret
-                  key: DB_PASSWORD
+                  name: {{ include "task-manager.postgresql.fullname" . }}-superuser  # Зміни -app на -superuser
+                  key: password
             - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:

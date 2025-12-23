@@ -13,7 +13,12 @@ spec:
   
   # PostgreSQL version
   imageName: {{ .Values.postgresql.image.registry }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
-  
+
+  enableSuperuserAccess: true
+
+  postgresUID: 999
+  postgresGID: 999
+
   # Bootstrap configuration
   bootstrap:
     initdb:
@@ -37,11 +42,7 @@ spec:
     limits:
       cpu: {{ .Values.postgresql.resources.limits.cpu }}
       memory: {{ .Values.postgresql.resources.limits.memory }}
-  
-  # Monitoring
-  monitoring:
-    enabled: false
-  
+
   # PostgreSQL configuration
   postgresql:
     parameters:
