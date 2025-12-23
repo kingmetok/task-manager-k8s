@@ -7,7 +7,7 @@ metadata:
     {{- include "task-manager.labels" . | nindent 4 }}
 data:
   # Database configuration
-  DB_HOST: {{ include "task-manager.postgresql.fullname" . }}
+  DB_HOST: {{ include "task-manager.postgresql.fullname" . }}-rw
   DB_PORT: "5432"
   DB_NAME: {{ .Values.postgresql.auth.database }}
   DB_USER: {{ .Values.postgresql.auth.username }}
