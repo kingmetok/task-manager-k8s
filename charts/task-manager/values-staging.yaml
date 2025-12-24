@@ -1,10 +1,10 @@
-# Development environment overrides
+# Staging environment overrides
 app:
   replicaCount: 1
 
   image:
     tag: "latest"
-    pullPolicy: Always  # Always pull for dev
+    pullPolicy: Always
 
   resources:
     requests:
@@ -17,7 +17,7 @@ app:
   ingress:
     enabled: true
     hosts:
-      - host: task-manager-dev.127.0.0.1.sslip.io
+      - host: task-manager-staging.127.0.0.1.sslip.io
         paths:
           - path: /
             pathType: Prefix
@@ -49,4 +49,4 @@ dragonfly:
       memory: 256Mi
 
 namespace:
-  name: task-manager-dev
+  name: staging

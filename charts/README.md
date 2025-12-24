@@ -14,7 +14,7 @@ Helm chart for deploying Task Manager REST API with PostgreSQL and Dragonfly (Re
 ### Development Environment
 ```bash
 helm install task-manager-dev charts/task-manager \
-  -f charts/task-manager/values-dev.yaml \
+  -f charts/task-manager/values-staging.yaml \
   --namespace task-manager-dev \
   --create-namespace
 ```
@@ -22,7 +22,7 @@ helm install task-manager-dev charts/task-manager \
 ### Production Environment
 ```bash
 helm install task-manager-prod charts/task-manager \
-  -f charts/task-manager/values-prod.yaml \
+  -f charts/task-manager/values-production.yaml \
   --namespace task-manager-prod \
   --create-namespace
 ```
@@ -56,19 +56,19 @@ helm lint charts/task-manager
 
 # Dry-run installation
 helm install test charts/task-manager \
-  -f charts/task-manager/values-dev.yaml \
+  -f charts/task-manager/values-staging.yaml \
   --dry-run --debug
 
 # Template generation
 helm template test charts/task-manager \
-  -f charts/task-manager/values-dev.yaml \
+  -f charts/task-manager/values-staging.yaml \
   > output.yaml
 ```
 
 ## Upgrading
 ```bash
 helm upgrade task-manager-dev charts/task-manager \
-  -f charts/task-manager/values-dev.yaml \
+  -f charts/task-manager/values-staging.yaml \
   -n task-manager-dev
 ```
 
