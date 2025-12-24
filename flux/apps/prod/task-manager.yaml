@@ -42,7 +42,7 @@ data:
     app:
       replicaCount: 3
       image:
-        tag: "1.0.0"
+        tag: "latest"
         pullPolicy: IfNotPresent
       resources:
         requests:
