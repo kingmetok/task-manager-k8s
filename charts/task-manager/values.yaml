@@ -41,7 +41,7 @@ app:
 
   # Ingress
   ingress:
-    enabled: false
+    enabled: true
     className: nginx
     annotations: {}
     hosts:
@@ -49,7 +49,11 @@ app:
         paths:
           - path: /
             pathType: Prefix
-    tls: []
+    tls:
+      enabled: true
+      secretName: task-manager-tls
+      issuer: ca-issuer
+
 
   # Health checks
   livenessProbe:

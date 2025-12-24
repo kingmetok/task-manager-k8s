@@ -9,19 +9,18 @@ metadata:
   {{- with .Values.app.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
+    {{- if $.Values.app.ingress.tls.enabled }}
+    cert-manager.io/cluster-issuer: {{ $.Values.app.ingress.tls.issuer }}
+    {{- end }}
   {{- end }}
 spec:
-  {{- if .Values.app.ingress.className }}
   ingressClassName: {{ .Values.app.ingress.className }}
-  {{- end }}
-  {{- if .Values.app.ingress.tls }}
+  {{- if .Values.app.ingress.tls.enabled }}
   tls:
-    {{- range .Values.app.ingress.tls }}
+    {{- range .Values.app.ingress.hosts }}
     - hosts:
-        {{- range .hosts }}
-        - {{ . | quote }}
-        {{- end }}
-      secretName: {{ .secretName }}
+        - {{ .host | quote }}
+      secretName: {{ $.Values.app.ingress.tls.secretName }}-{{ .host | replace "." "-" }}
     {{- end }}
   {{- end }}
   rules:
@@ -36,7 +35,7 @@ spec:
               service:
                 name: {{ include "task-manager.fullname" $ }}
                 port:
-                  number: {{ $.Values.app.service.port }}
+                  number: 8080
           {{- end }}
     {{- end }}
 {{- end }}

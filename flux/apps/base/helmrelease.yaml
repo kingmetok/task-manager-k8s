@@ -32,6 +32,10 @@ spec:
       ingress:
         enabled: true
         className: nginx
+        tls:
+          enabled: true
+          secretName: task-manager-tls
+          issuer: ca-issuer
 
     postgresql:
       enabled: true
@@ -42,3 +46,4 @@ spec:
 
     dragonfly:
       enabled: true
+
