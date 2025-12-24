@@ -2,13 +2,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: task-manager-dev
+  name: task-manager-production
   namespace: flux-system
 spec:
   interval: 10m
   timeout: 5m
-  releaseName: task-manager-dev
-  targetNamespace: task-manager-dev
+  releaseName: task-manager-production
+  targetNamespace: production
   install:
     createNamespace: true
     remediation:
@@ -26,7 +26,7 @@ spec:
       interval: 1h
   valuesFrom:
     - kind: ConfigMap
-      name: task-manager-dev-values
+      name: task-manager-production-values
       optional: false
   dependsOn:
     - name: cloudnative-pg
@@ -35,55 +35,59 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: task-manager-dev-values
+  name: task-manager-production-values
   namespace: flux-system
 data:
   values.yaml: |
     app:
-      replicaCount: 1
+      replicaCount: 2
       image:
         tag: "latest"
-        pullPolicy: Always
+        pullPolicy: IfNotPresent
       resources:
         requests:
-          cpu: 100m
-          memory: 256Mi
-        limits:
-          cpu: 500m
+          cpu: 200m
           memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
       ingress:
         enabled: true
         hosts:
-          - host: task-manager-dev.127.0.0.1.sslip.io
+          - host: app.local
             paths:
               - path: /
                 pathType: Prefix
       autoscaling:
-        enabled: false
+        enabled: true
+        minReplicas: 2
+        maxReplicas: 5
+        targetCPUUtilizationPercentage: 70
+        targetMemoryUtilizationPercentage: 80
     
     postgresql:
       enabled: true
-      instances: 1
+      instances: 3
       persistence:
-        size: 1Gi
+        size: 10Gi
       resources:
         requests:
-          cpu: 100m
-          memory: 256Mi
+          cpu: 500m
+          memory: 1Gi
         limits:
-          cpu: 250m
-          memory: 512Mi
+          cpu: 2000m
+          memory: 2Gi
     
     dragonfly:
       enabled: true
-      replicas: 1
+      replicas: 2
       resources:
         requests:
-          cpu: 100m
-          memory: 128Mi
-        limits:
           cpu: 250m
-          memory: 256Mi
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
     
     namespace:
-      name: task-manager-dev
+      name: production

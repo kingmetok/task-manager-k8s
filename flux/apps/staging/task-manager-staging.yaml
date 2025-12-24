@@ -2,13 +2,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: task-manager-prod
+  name: task-manager-staging
   namespace: flux-system
 spec:
   interval: 10m
   timeout: 5m
-  releaseName: task-manager-prod
-  targetNamespace: task-manager-prod
+  releaseName: task-manager-staging
+  targetNamespace: staging
   install:
     createNamespace: true
     remediation:
@@ -26,7 +26,7 @@ spec:
       interval: 1h
   valuesFrom:
     - kind: ConfigMap
-      name: task-manager-prod-values
+      name: task-manager-staging-values
       optional: false
   dependsOn:
     - name: cloudnative-pg
@@ -35,59 +35,55 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: task-manager-prod-values
+  name: task-manager-staging-values
   namespace: flux-system
 data:
   values.yaml: |
     app:
-      replicaCount: 3
+      replicaCount: 1
       image:
         tag: "latest"
-        pullPolicy: IfNotPresent
+        pullPolicy: Always
       resources:
         requests:
-          cpu: 200m
-          memory: 512Mi
+          cpu: 50m
+          memory: 128Mi
         limits:
-          cpu: 1000m
-          memory: 1Gi
+          cpu: 250m
+          memory: 256Mi
       ingress:
         enabled: true
         hosts:
-          - host: task-manager-prod.127.0.0.1.sslip.io
+          - host: app.staging.local
             paths:
               - path: /
                 pathType: Prefix
       autoscaling:
-        enabled: true
-        minReplicas: 3
-        maxReplicas: 10
-        targetCPUUtilizationPercentage: 70
-        targetMemoryUtilizationPercentage: 80
+        enabled: false
     
     postgresql:
       enabled: true
-      instances: 3  # High Availability
+      instances: 1
       persistence:
-        size: 10Gi
+        size: 1Gi
       resources:
         requests:
-          cpu: 500m
-          memory: 1Gi
+          cpu: 50m
+          memory: 128Mi
         limits:
-          cpu: 2000m
-          memory: 2Gi
+          cpu: 200m
+          memory: 256Mi
     
     dragonfly:
       enabled: true
-      replicas: 2  # High Availability
+      replicas: 1
       resources:
         requests:
-          cpu: 250m
-          memory: 512Mi
+          cpu: 50m
+          memory: 64Mi
         limits:
-          cpu: 1000m
-          memory: 1Gi
+          cpu: 100m
+          memory: 128Mi
     
     namespace:
-      name: task-manager-prod
+      name: staging

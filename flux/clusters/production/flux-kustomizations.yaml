@@ -17,11 +17,11 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: task-manager-dev
+  name: task-manager-staging
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./flux/apps/dev
+  path: ./flux/apps/staging
   prune: true
   sourceRef:
     kind: GitRepository
@@ -34,11 +34,11 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: task-manager-prod
+  name: task-manager-production
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./flux/apps/prod
+  path: ./flux/apps/production
   prune: true
   sourceRef:
     kind: GitRepository
