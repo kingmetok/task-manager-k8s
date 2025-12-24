@@ -1,0 +1,44 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: task-manager
+  namespace: flux-system
+spec:
+  interval: 10m
+  timeout: 5m
+  chart:
+    spec:
+      chart: ./charts/task-manager
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+      interval: 1h
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  dependsOn:
+    - name: cloudnative-pg
+      namespace: flux-system
+  values:
+    app:
+      image:
+        repository: ghcr.io/kingmetok/task-manager-k8s
+        tag: "latest"
+      ingress:
+        enabled: true
+        className: nginx
+
+    postgresql:
+      enabled: true
+      image:
+        registry: docker.io
+        repository: postgres
+        tag: "16"
+
+    dragonfly:
+      enabled: true

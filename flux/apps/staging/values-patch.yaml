@@ -1,0 +1,52 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: task-manager
+spec:
+  releaseName: task-manager-staging
+  targetNamespace: staging
+  values:
+    app:
+      replicaCount: 1
+      image:
+        pullPolicy: Always
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 250m
+          memory: 256Mi
+      ingress:
+        hosts:
+          - host: app.staging.local
+            paths:
+              - path: /
+                pathType: Prefix
+      autoscaling:
+        enabled: false
+
+    postgresql:
+      instances: 1
+      persistence:
+        size: 1Gi
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+
+    dragonfly:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+
+    namespace:
+      name: staging

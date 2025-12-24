@@ -1,4 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: flux-system
 resources:
-  - task-manager-production.yaml
+  - ../base
+namePrefix: production-
+nameSuffix: ""
+patches:
+  - path: values-patch.yaml
+    target:
+      kind: HelmRelease
+      name: task-manager
