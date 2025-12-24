@@ -32,6 +32,11 @@ spec:
       ingress:
         enabled: true
         className: nginx
+        hosts:
+          - host: task-manager.127.0.0.1.sslip.io
+            paths:
+              - path: /
+                pathType: Prefix
         tls:
           enabled: true
           secretName: task-manager-tls
