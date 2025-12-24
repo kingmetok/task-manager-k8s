@@ -19,7 +19,7 @@ spec:
           memory: 1Gi
       ingress:
         hosts:
-          - host: app.local
+          - host: task-manager-production.127.0.0.1.sslip.io
             paths:
               - path: /
                 pathType: Prefix

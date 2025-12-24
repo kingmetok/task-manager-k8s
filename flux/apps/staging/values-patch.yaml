@@ -19,7 +19,7 @@ spec:
           memory: 512Mi
       ingress:
         hosts:
-          - host: app.staging.local
+          - host: task-manager-staging.127.0.0.1.sslip.io
             paths:
               - path: /
                 pathType: Prefix

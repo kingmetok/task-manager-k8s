@@ -45,7 +45,7 @@ app:
     className: nginx
     annotations: {}
     hosts:
-      - host: task-manager.local
+      - host: task-manager.127.0.0.1.sslip.io
         paths:
           - path: /
             pathType: Prefix
